@@ -1,8 +1,6 @@
 const TelegramBot = require("node-telegram-bot-api");
 const mongoose = require("mongoose");
 const User = require("./models/user");
-const dateFormat = require("dateformat");
-const masks = require("dateformat").masks;
 const { KGUSTA_START, KGUSTA_FINISH } = require("./models/kgusta");
 const {
   shareLocationKeyboard,
@@ -115,7 +113,11 @@ bot.on("location", (msg) => {
           latitude <= KGUSTA_FINISH.latitude
         ) {
           const currentDate = new Date();
-          currentDate = dateFormat(currentDate, "ddd, dd.mm.yyyy");
+          import("dateformat").then((dateFormatModule) => {
+            const dateFormat = dateFormatModule.default;
+            const masks = dateFormatModule.masks;
+            currentDate = dateFormat(currentDate, "ddd, dd.mm.yyyy");
+          });
           if (user.attendance[user.attendance.length - 1] === currentDate) {
             bot.sendMessage(
               opts.chat_id,
