@@ -9,6 +9,10 @@ on:
   pull_request:
     branches: [ "master" ]
 
+env:
+  MONGO_DB: ${{ vars.MONGO_DB }}
+  BOT_TOKEN: ${{ vars.BOT_TOKEN }}
+
 jobs:
   build:
 
