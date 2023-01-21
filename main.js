@@ -117,7 +117,8 @@ bot.on("location", (msg) => {
             import("dateformat").then((dateFormatModule) => {
               const dateFormat = dateFormatModule.default;
               const masks = dateFormatModule.masks;
-              const formattedDate = dateFormat(currentDate, "ddd, dd.mm.yyyy");
+              masks.hammerTime = "dd.mm.yyyy";
+              const formattedDate = dateFormat(currentDate, "hammerTime");
               return formattedDate;
             });
           }
