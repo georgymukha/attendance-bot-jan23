@@ -113,12 +113,16 @@ bot.on("location", (msg) => {
           latitude <= KGUSTA_FINISH.latitude
         ) {
           const currentDate = new Date();
-          import("dateformat").then((dateFormatModule) => {
-            const dateFormat = dateFormatModule.default;
-            const masks = dateFormatModule.masks;
-            const formatedDate = dateFormat(currentDate, "ddd, dd.mm.yyyy");
-          });
-          if (user.attendance[user.attendance.length - 1] === formatedDate) {
+          function formatDate(currentDate) {
+            import("dateformat").then((dateFormatModule) => {
+              const dateFormat = dateFormatModule.default;
+              const masks = dateFormatModule.masks;
+              const formattedDate = dateFormat(currentDate, "ddd, dd.mm.yyyy");
+              return formattedDate;
+            });
+          }
+          const formattedDate = formatDate(currentDate);
+          if (user.attendance[user.attendance.length - 1] === formattedDate) {
             bot.sendMessage(
               opts.chat_id,
               "You was marked today already!",
