@@ -112,18 +112,12 @@ bot.on("location", (msg) => {
           KGUSTA_START.latitude <= latitude &&
           latitude <= KGUSTA_FINISH.latitude
         ) {
-          const currentDate = new Date();
-          function formatDate(currentDate) {
-            import("dateformat").then((dateFormatModule) => {
-              const dateFormat = dateFormatModule.default;
-              const masks = dateFormatModule.masks;
-              masks.hammerTime = "dd.mm.yyyy";
-              const formattedDate = dateFormat(currentDate, "hammerTime");
-              return formattedDate;
-            });
-          }
-          const formattedDate = formatDate(currentDate);
-          if (user.attendance[user.attendance.length - 1] === formattedDate) {
+          const currentDate = new Date().toLocaleDateString("ru-RU", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "2-digit",
+          });
+          if (user.attendance[user.attendance.length - 1] === currentDate) {
             bot.sendMessage(
               opts.chat_id,
               "You was marked today already!",
@@ -132,7 +126,7 @@ bot.on("location", (msg) => {
           } else {
             User.findOneAndUpdate(
               { telegramId: msg.from.id },
-              { $push: { attendance: formattedDate } },
+              { $push: { attendance: currentDate } },
               (err) => {
                 if (err) {
                   console.log(err);
