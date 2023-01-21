@@ -132,7 +132,7 @@ bot.on("location", (msg) => {
           } else {
             User.findOneAndUpdate(
               { telegramId: msg.from.id },
-              { $push: { attendance: currentDate } },
+              { $push: { attendance: formattedDate } },
               (err) => {
                 if (err) {
                   console.log(err);
