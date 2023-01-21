@@ -1,7 +1,8 @@
 const TelegramBot = require("node-telegram-bot-api");
 const mongoose = require("mongoose");
 const User = require("./models/user");
-import dateFormat, { masks } from "dateformat";
+const dateFormat = require("dateformat");
+const masks = require("dateformat").masks;
 const { KGUSTA_START, KGUSTA_FINISH } = require("./models/kgusta");
 const {
   shareLocationKeyboard,

@@ -33,4 +33,4 @@ jobs:
         run: npm install
       - name: Install dependencies
         run: npm ci
-      - run: node --experimental-vm-modules main.js
+      - run: npm start
