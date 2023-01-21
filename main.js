@@ -116,9 +116,9 @@ bot.on("location", (msg) => {
           import("dateformat").then((dateFormatModule) => {
             const dateFormat = dateFormatModule.default;
             const masks = dateFormatModule.masks;
-            currentDate = dateFormat(currentDate, "ddd, dd.mm.yyyy");
+            const formatedDate = dateFormat(currentDate, "ddd, dd.mm.yyyy");
           });
-          if (user.attendance[user.attendance.length - 1] === currentDate) {
+          if (user.attendance[user.attendance.length - 1] === formatedDate) {
             bot.sendMessage(
               opts.chat_id,
               "You was marked today already!",
