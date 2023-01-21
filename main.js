@@ -58,7 +58,11 @@ bot.onText(/Register/, (msg) => {
           newUser
             .save()
             .then(() => {
-              bot.sendMessage(opts.chat_id, "Registration successful!");
+              bot.sendMessage(
+                opts.chat_id,
+                "Registration successful!",
+                registerAndMarkKeyboard
+              );
             })
             .catch((error) => {
               console.log(error);
@@ -80,8 +84,20 @@ bot.onText(/Mark Attendance/, (msg) => {
     "Please share your location:",
     shareLocationKeyboard
   );
+});
 
-  bot.on("location", (msg) => {
+bot.on("location", (msg) => {
+  const opts = {
+    chat_id: msg.chat.id,
+    message_id: msg.message_id,
+  };
+  if (!msg.reply_to_message) {
+    bot.sendMessage(
+      opts.chat_id,
+      "You should press on the button!",
+      shareLocationKeyboard
+    );
+  } else {
     User.findOne({ telegramId: msg.from.id }, (err, user) => {
       if (err) {
         console.log(err);
@@ -97,113 +113,13 @@ bot.onText(/Mark Attendance/, (msg) => {
           latitude <= KGUSTA_FINISH.latitude
         ) {
           const currentDate = new Date().toLocaleDateString();
-
-          User.findOneAndUpdate(
-            { telegramId: msg.from.id },
-            { $push: { attendance: currentDate } },
-            (err) => {
-              if (err) {
-                console.log(err);
-                return;
-              }
-              bot.sendMessage(
-                opts.chat_id,
-                "Attendance marked!",
-                registerAndMarkKeyboard
-              );
-            }
-          );
-        } else
-          bot.sendMessage(
-            opts.chat_id,
-            "You are not in KGUSTA!",
-            registerAndMarkKeyboard
-          );
-      } else {
-        bot.sendMessage(
-          opts.chat_id,
-          "You need to register first!",
-          registerAndMarkKeyboard
-        );
-      }
-    });
-  });
-});
-
-bot.on("callback_query", async (callbackQuery) => {
-  const action = callbackQuery.data;
-  const msg = callbackQuery.message;
-  const opts = {
-    chat_id: msg.chat.id,
-    message_id: msg.message_id,
-  };
-
-  if (action === "register") {
-    User.findOne({ telegramId: msg.from.id }, (err, user) => {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      if (user) {
-        bot.sendMessage(opts.chat_id, "You are already registered!");
-      } else {
-        bot.sendMessage(opts.chat_id, "Please enter your first name:");
-        bot.once("message", (msg) => {
-          const firstName = msg.text;
-          bot.sendMessage(opts.chat_id, "Please enter your last name:");
-          bot.once("message", (msg) => {
-            const lastName = msg.text;
-            const newUser = new User({
-              telegramId: msg.from.id,
-              firstName: firstName,
-              lastName: lastName,
-            });
-            newUser
-              .save()
-              .then(() => {
-                bot.sendMessage(opts.chat_id, "Registration successful!");
-              })
-              .catch((error) => {
-                console.log(error);
-                bot.sendMessage(opts.chat_id, "You are already registered!");
-              });
-          });
-        });
-      }
-    });
-  } else if (action === "attendance") {
-    bot.sendMessage(opts.chat_id, "Please share your location:", {
-      reply_markup: {
-        keyboard: [
-          [
-            {
-              text: "Share Location",
-              request_location: true,
-            },
-          ],
-        ],
-        resize_keyboard: true,
-        one_time_keyboard: true,
-      },
-    });
-
-    bot.on("location", (msg) => {
-      User.findOne({ telegramId: msg.from.id }, (err, user) => {
-        if (err) {
-          console.log(err);
-          return;
-        }
-        if (user) {
-          let longitude = msg.location.longitude;
-          let latitude = msg.location.latitude;
-          if (
-            KGUSTA_START.longitude <= longitude &&
-            longitude <= KGUSTA_FINISH.longitude &&
-            KGUSTA_START.latitude <= latitude &&
-            latitude <= KGUSTA_FINISH.latitude
-          ) {
-            const currentDate = new Date().toLocaleDateString();
-
+          if (user.attendance[user.attendance.length - 1] === currentDate) {
+            bot.sendMessage(
+              opts.chat_id,
+              "You was marked today already!",
+              registerAndMarkKeyboard
+            );
+          } else {
             User.findOneAndUpdate(
               { telegramId: msg.from.id },
               { $push: { attendance: currentDate } },
@@ -212,14 +128,28 @@ bot.on("callback_query", async (callbackQuery) => {
                   console.log(err);
                   return;
                 }
-                bot.sendMessage(opts.chat_id, "Attendance marked!");
+                bot.sendMessage(
+                  opts.chat_id,
+                  "Attendance marked!",
+                  registerAndMarkKeyboard
+                );
               }
             );
-          } else bot.sendMessage(opts.chat_id, "You are not in KGUSTA!");
+          }
         } else {
-          bot.sendMessage(opts.chat_id, "You need to register first!");
+          bot.sendMessage(
+            opts.chat_id,
+            "You are not in KGUSTA!",
+            registerAndMarkKeyboard
+          );
         }
-      });
+      } else {
+        bot.sendMessage(
+          opts.chat_id,
+          "You need to register first!",
+          registerAndMarkKeyboard
+        );
+      }
     });
   }
 });
