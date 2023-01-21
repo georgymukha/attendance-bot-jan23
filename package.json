@@ -15,6 +15,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "dateformat": "^5.0.3",
     "dotenv": "^16.0.3",
     "google-auth-library": "^8.7.0",
     "googleapis": "^110.0.0",
