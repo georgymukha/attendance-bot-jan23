@@ -1,3 +1,5 @@
+const express = require("express");
+const cors = require("cors");
 const TelegramBot = require("node-telegram-bot-api");
 const mongoose = require("mongoose");
 const User = require("./models/user");
@@ -11,7 +13,7 @@ const bot = new TelegramBot(process.env.BOT_TOKEN, {
   polling: true,
 });
 
-mongoose.connect(process.env.MONGO_DB, {
+mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -156,4 +158,26 @@ bot.on("location", (msg) => {
       }
     });
   }
+});
+
+// Web Interface
+
+// Create a Mongoose model from the schema
+const app = express();
+app.use(cors({ origin: "http://127.0.0.1:5500" }));
+
+// Serve data through an API endpoint
+app.get("/api/users", async (req, res) => {
+  try {
+    const users = await User.find();
+    res.send(users);
+  } catch (error) {
+    res.send(error);
+  }
+});
+
+// Start the server
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
 });

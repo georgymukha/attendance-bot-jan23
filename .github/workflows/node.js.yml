@@ -10,7 +10,7 @@ on:
     branches: ["master"]
 
 env:
-  MONGO_DB: ${{ vars.MONGO_DB }}
+  MONGODB_URI: ${{ vars.MONGODB_URI }}
   BOT_TOKEN: ${{ vars.BOT_TOKEN }}
 
 jobs:
