@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DevX Bishkek Attendance</title>
+    <link rel="stylesheet" href="./styles/styles.css" />
+  </head>
+
+  <body onload="">
+    <table id="data-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Attendance</th>
+        </tr>
+      </thead>
+      <tbody id="data-body">
+        <!-- Rows will be inserted here dynamically -->
+      </tbody>
+    </table>
+
+    <!-- Input for filtering by date -->
+    <input type="date" id="date-filter" />
+    <script>
+      async function getData() {
+        const response = await fetch(`http://localhost:3000/api/users`);
+        const data = await response.json();
+        console.log(data);
+        data.forEach((elem) => {
+          console.log(elem);
+        });
+        return data;
+      }
+    </script>
+    <script src="./js/index.js"></script>
+  </body>
+</html>
