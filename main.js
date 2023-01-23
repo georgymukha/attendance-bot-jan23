@@ -220,22 +220,22 @@ bot.on("location", (msg) => {
 
 // Web Interface
 
-// Create a Mongoose model from the schema
-const app = express();
-app.use(cors({ origin: "http://127.0.0.1:5500" }));
+// // Create a Mongoose model from the schema
+// const app = express();
+// app.use(cors({ origin: "http://127.0.0.1:5500" }));
 
-// Serve data through an API endpoint
-app.get("/api/users", async (req, res) => {
-  try {
-    const users = await User.find();
-    res.send(users);
-  } catch (error) {
-    res.send(error);
-  }
-});
+// // Serve data through an API endpoint
+// app.get("/api/users", async (req, res) => {
+//   try {
+//     const users = await User.find();
+//     res.send(users);
+//   } catch (error) {
+//     res.send(error);
+//   }
+// });
 
 // Start the server
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
-});
+// const PORT = 4000;
+// app.listen(PORT, () => {
+//   console.log(`Server running at http://localhost:${PORT}`);
+// });
