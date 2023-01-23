@@ -150,7 +150,7 @@ bot.on("location", (msg) => {
             month: "2-digit",
             year: "2-digit",
           });
-          if (user.attendance[user.attendance.length - 1] === currentDate) {
+          if (user.attendance.includes(currentDate)) {
             bot.sendMessage(
               opts.chat_id,
               "You was marked today already!",
