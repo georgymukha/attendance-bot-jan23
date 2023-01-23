@@ -7,6 +7,7 @@ const { KGUSTA_START, KGUSTA_FINISH } = require("./models/kgusta");
 const {
   shareLocationKeyboard,
   registerAndMarkKeyboard,
+  markKeyboard,
 } = require("./models/keyboard");
 require("dotenv").config();
 const bot = new TelegramBot(process.env.BOT_TOKEN, {
@@ -44,7 +45,11 @@ bot.onText(/Register/, (msg) => {
       return;
     }
     if (user) {
-      bot.sendMessage(opts.chat_id, "You are already registered!");
+      bot.sendMessage(
+        opts.chat_id,
+        "You are already registered!",
+        markKeyboard
+      );
     } else {
       bot.sendMessage(opts.chat_id, "Please enter your first name:");
       bot.once("message", (msg) => {
@@ -68,7 +73,11 @@ bot.onText(/Register/, (msg) => {
             })
             .catch((error) => {
               console.log(error);
-              bot.sendMessage(opts.chat_id, "You are already registered!");
+              bot.sendMessage(
+                opts.chat_id,
+                "You are already registered!",
+                markKeyboard
+              );
             });
         });
       });
@@ -86,6 +95,28 @@ bot.onText(/Mark Attendance/, (msg) => {
     "Please share your location:",
     shareLocationKeyboard
   );
+});
+
+bot.onText(/Who am I/, (msg) => {
+  const opts = {
+    chat_id: msg.chat.id,
+    message_id: msg.message_id,
+  };
+  User.findOne({ telegramId: msg.from.id }, (err, user) => {
+    if (err) {
+      console.log(err);
+      return;
+    }
+    if (user) {
+      let { firstName, lastName, attendance } = user;
+      attendance = attendance.slice(-1)[0];
+      bot.sendMessage(
+        opts.chat_id,
+        `Your name is: ${firstName} ${lastName}.\nLast attendance on ${attendance}`,
+        markKeyboard
+      );
+    }
+  });
 });
 
 bot.on("location", (msg) => {
@@ -123,7 +154,7 @@ bot.on("location", (msg) => {
             bot.sendMessage(
               opts.chat_id,
               "You was marked today already!",
-              registerAndMarkKeyboard
+              markKeyboard
             );
           } else {
             User.findOneAndUpdate(
@@ -137,17 +168,13 @@ bot.on("location", (msg) => {
                 bot.sendMessage(
                   opts.chat_id,
                   "Attendance marked!",
-                  registerAndMarkKeyboard
+                  markKeyboard
                 );
               }
             );
           }
         } else {
-          bot.sendMessage(
-            opts.chat_id,
-            "You are not in KGUSTA!",
-            registerAndMarkKeyboard
-          );
+          bot.sendMessage(opts.chat_id, "You are not in KGUSTA!", markKeyboard);
         }
       } else {
         bot.sendMessage(

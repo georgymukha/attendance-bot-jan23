@@ -16,6 +16,24 @@ let registerAndMarkKeyboard = {
   },
 };
 
+let markKeyboard = {
+  reply_markup: {
+    keyboard: [
+      [
+        {
+          text: "📍Mark Attendance",
+          callback_data: "attendance",
+        },
+        {
+          text: "❓Who am I",
+          callback_data: "attendance",
+        },
+      ],
+    ],
+    resize_keyboard: true,
+  },
+};
+
 let shareLocationKeyboard = {
   reply_markup: {
     keyboard: [
@@ -31,4 +49,8 @@ let shareLocationKeyboard = {
   },
 };
 
-module.exports = { registerAndMarkKeyboard, shareLocationKeyboard };
+module.exports = {
+  registerAndMarkKeyboard,
+  shareLocationKeyboard,
+  markKeyboard,
+};
