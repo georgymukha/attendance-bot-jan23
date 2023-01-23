@@ -8,7 +8,10 @@ const {
   shareLocationKeyboard,
   registerAndMarkKeyboard,
   markKeyboard,
+  selectCourseInlineKeyboard,
+  emptyKeyboard,
 } = require("./models/keyboard");
+const { welcomeMessage, helpMessage } = require("./models/messages");
 require("dotenv").config();
 const bot = new TelegramBot(process.env.BOT_TOKEN, {
   polling: true,
@@ -27,11 +30,10 @@ db.once("open", function () {
 });
 
 bot.onText(/\/start/, (msg) => {
-  bot.sendMessage(
-    msg.chat.id,
-    "Welcome! Please register your name",
-    registerAndMarkKeyboard
-  );
+  bot.sendMessage(msg.chat.id, welcomeMessage, registerAndMarkKeyboard);
+});
+bot.onText(/\/help/, (msg) => {
+  bot.sendMessage(msg.chat.id, helpMessage);
 });
 
 bot.onText(/Register/, (msg) => {
@@ -51,34 +53,58 @@ bot.onText(/Register/, (msg) => {
         markKeyboard
       );
     } else {
-      bot.sendMessage(opts.chat_id, "Please enter your first name:");
+      bot.sendMessage(
+        opts.chat_id,
+        "Please enter your first name:",
+        emptyKeyboard
+      );
       bot.once("message", (msg) => {
         const firstName = msg.text;
         bot.sendMessage(opts.chat_id, "Please enter your last name:");
         bot.once("message", (msg) => {
           const lastName = msg.text;
-          const newUser = new User({
-            telegramId: msg.from.id,
-            firstName: firstName,
-            lastName: lastName,
-          });
-          newUser
-            .save()
-            .then(() => {
-              bot.sendMessage(
-                opts.chat_id,
-                "Registration successful!",
-                registerAndMarkKeyboard
-              );
-            })
-            .catch((error) => {
-              console.log(error);
-              bot.sendMessage(
-                opts.chat_id,
-                "You are already registered!",
-                markKeyboard
-              );
+          bot.sendMessage(
+            opts.chat_id,
+            "Please select your course:",
+            selectCourseInlineKeyboard
+          );
+          bot.once("callback_query", (callbackQuery) => {
+            const newUser = new User({
+              telegramId: msg.from.id,
+              firstName: firstName,
+              course: callbackQuery.data,
+              lastName: lastName,
             });
+            newUser
+              .save()
+              .then(() => {
+                bot.sendMessage(
+                  opts.chat_id,
+                  "Registration successful!",
+                  markKeyboard
+                );
+                bot.editMessageReplyMarkup(
+                  {},
+                  {
+                    chat_id: callbackQuery.message.chat.id,
+                    message_id: callbackQuery.message.message_id,
+                  }
+                );
+                console.log(callbackQuery);
+                bot.editMessageText(`Your course is: ${callbackQuery.data}`, {
+                  chat_id: callbackQuery.message.chat.id,
+                  message_id: callbackQuery.message.message_id,
+                });
+              })
+              .catch((error) => {
+                console.log(error);
+                bot.sendMessage(
+                  opts.chat_id,
+                  "You are already registered!",
+                  markKeyboard
+                );
+              });
+          });
         });
       });
     }
@@ -108,11 +134,16 @@ bot.onText(/Who am I/, (msg) => {
       return;
     }
     if (user) {
-      let { firstName, lastName, attendance } = user;
+      let { firstName, lastName, attendance, course } = user;
       attendance = attendance.slice(-1)[0];
+      if (attendance) {
+        attendance = `Last attendance on ${attendance}`;
+      } else {
+        attendance = `You wasn't attended yet.`;
+      }
       bot.sendMessage(
         opts.chat_id,
-        `Your name is: ${firstName} ${lastName}.\nLast attendance on ${attendance}`,
+        `Your name is: ${firstName} ${lastName}.\nYour course is ${course}.\n${attendance}`,
         markKeyboard
       );
     }

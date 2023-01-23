@@ -49,8 +49,33 @@ let shareLocationKeyboard = {
   },
 };
 
+let emptyKeyboard = {
+  reply_markup: { hide_keyboard: true },
+};
+
+let selectCourseInlineKeyboard = {
+  reply_markup: {
+    inline_keyboard: [
+      [
+        { text: "SDET", callback_data: "SDET" },
+        { text: "Full Stack", callback_data: "Full Stack" },
+      ],
+      [
+        { text: "UX/UI", callback_data: "UX/UI" },
+        { text: "DSML", callback_data: "DSML" },
+      ],
+      [
+        { text: "DevOps", callback_data: "DevOps" },
+        { text: "PM", callback_data: "PM" },
+      ],
+    ],
+  },
+};
+
 module.exports = {
   registerAndMarkKeyboard,
   shareLocationKeyboard,
   markKeyboard,
+  selectCourseInlineKeyboard,
+  emptyKeyboard,
 };
